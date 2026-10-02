@@ -1,0 +1,874 @@
+prompt_version,case_id,json_valid,clean_json,schema_valid,schema_errors,hallucinations,business_name_correct,contact_name_correct,email_correct,phone_correct,industry_correct,services_correct,budget_usd_correct,has_website_correct,raw_output
+v1_baseline,case_01,True,False,False,"missing: ['business_name', 'contact_name', 'email', 'phone', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['client', 'project']",0,False,False,False,False,False,False,False,False,"```json
+{
+  ""client"": {
+    ""name"": ""Maria Gonzalez"",
+    ""business_name"": ""Casa Maria Taqueria"",
+    ""business_type"": ""Restaurant (taqueria)"",
+    ""location"": ""Off Westheimer (Houston, TX area)"",
+    ""phone"": ""713-555-0142"",
+    ""phone_type"": ""cell"",
+    ""email"": ""maria@casamariatx.com""
+  },
+  ""project"": {
+    ""services_requested"": [
+      ""New website"",
+      ""Online ordering""
+    ],
+    ""potential_future_services"": [
+      ""Social media""
+    ],
+    ""budget_usd"": 5000,
+    ""budget_note"": ""approximate"",
+    ""current_website_status"": ""Outdated (built around 2015)""
+  }
+}
+```
+
+Notes on the extraction:
+- **Location:** The notes only say ""off Westheimer."" I inferred Houston from the street name and the 713 area code, so please verify the city before using it.
+- **Budget:** ""About 5k"" is recorded as 5000 and flagged as approximate.
+- **Social media:** I listed it separately as a possible future service, since the notes say ""maybe later."""
+v1_baseline,case_02,True,False,False,"missing: ['business_name', 'services', 'budget_usd', 'has_website']; extra keys: ['first_name', 'last_name', 'title', 'company', 'location', 'services_needed', 'website_needs', 'goal', 'budget']; industry not in allowed list",0,False,True,True,True,True,False,True,False,"```json
+{
+  ""contact_name"": ""Dr. Kevin Park"",
+  ""first_name"": ""Kevin"",
+  ""last_name"": ""Park"",
+  ""title"": ""Dr."",
+  ""company"": ""Park Family Dental"",
+  ""industry"": ""Dental"",
+  ""location"": ""Katy"",
+  ""email"": ""kpark@parkfamilydental.com"",
+  ""phone"": null,
+  ""services_needed"": [""SEO"", ""Google Ads""],
+  ""website_needs"": ""Current site is fine; no redesign needed"",
+  ""goal"": ""Acquire more patients"",
+  ""budget"": null
+}
+```
+
+Notes:
+- Fields not mentioned in the notes (phone, budget) are set to `null` rather than guessed.
+- ""Katy"" is given without a state. It's likely Katy, TX, but the notes don't say, so I left it as written."
+v1_baseline,case_03,True,False,False,"missing: ['business_name', 'contact_name', 'industry', 'services', 'budget_usd']; extra keys: ['first_name', 'last_name', 'company', 'services_requested', 'budget', 'website_requested', 'notes']",0,False,False,True,True,False,False,False,True,"```json
+{
+  ""first_name"": ""Jasmine"",
+  ""last_name"": null,
+  ""company"": ""Glow Lab Med Spa"",
+  ""phone"": ""832.555.0199"",
+  ""email"": null,
+  ""services_requested"": [
+    ""Brand refresh"",
+    ""New logo"",
+    ""Instagram strategy""
+  ],
+  ""budget"": {
+    ""min"": 3000,
+    ""max"": 4000,
+    ""currency"": ""USD""
+  },
+  ""has_website"": false,
+  ""website_requested"": false,
+  ""notes"": ""Last name not obtained. Client currently has no website and is not requesting one at this time.""
+}
+```
+
+A few notes on my choices:
+- `last_name` and `email` are `null` since neither was provided.
+- The budget ""3-4k"" is converted to 3000-4000. I assumed USD, since the area code (832) is a Houston, TX number, but the notes don't state the currency."
+v1_baseline,case_04,True,False,False,"missing: ['business_name', 'contact_name', 'email', 'phone', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['client', 'interests', 'budget_notes', 'lead_source']",0,False,False,False,False,False,False,True,True,"```json
+{
+  ""client"": {
+    ""name"": ""Tony Russo"",
+    ""company"": ""Russo & Sons Construction"",
+    ""email"": ""tony@russoandsons.com"",
+    ""phone"": ""(281) 555-0177""
+  },
+  ""interests"": [
+    {
+      ""service"": ""CRM"",
+      ""purpose"": ""Track bids""
+    },
+    {
+      ""service"": ""IT support"",
+      ""scope"": ""Office with 8 computers""
+    }
+  ],
+  ""budget_notes"": ""Said 'whatever it costs, within reason'"",
+  ""lead_source"": ""Networking mixer""
+}
+```
+
+Notes:
+- The email was written as ""tony at russoandsons dot com"" in the original, so I converted it to standard format.
+- No specific budget figure was given, so I captured his exact comment instead of guessing a number."
+v1_baseline,case_05,True,False,False,"missing: ['business_name', 'email', 'phone', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['company_name', 'contact_role', 'contact_email', 'project_request', 'current_website_platform', 'budget']",0,False,True,False,True,False,False,False,False,"```json
+{
+  ""company_name"": ""Ironside Fitness"",
+  ""contact_name"": ""Dana Whitfield"",
+  ""contact_role"": ""Owner"",
+  ""contact_email"": ""dana@ironsidefit.co"",
+  ""project_request"": ""AI chatbot for class booking and lead follow-up"",
+  ""current_website_platform"": ""Wix"",
+  ""budget"": {
+    ""amount"": 2500,
+    ""currency"": ""USD""
+  }
+}
+```"
+v1_baseline,case_06,True,False,False,"missing: ['business_name', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['company', 'services_requested', 'requested_action', 'source']",0,False,True,True,True,False,False,True,True,"```json
+{
+  ""contact_name"": ""Marcus Bell"",
+  ""company"": ""Bell Realty Group"",
+  ""phone"": ""713-555-0123"",
+  ""email"": null,
+  ""services_requested"": [
+    ""Website for listings"",
+    ""Facebook management"",
+    ""Instagram management""
+  ],
+  ""requested_action"": ""Call back"",
+  ""source"": ""Voicemail""
+}
+```"
+v1_baseline,case_07,True,False,False,"missing: ['business_name', 'phone', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['company', 'services_interested_in', 'services_declined', 'goal', 'budget']",0,False,True,True,True,False,False,False,True,"```json
+{
+  ""contact_name"": ""Linh Tran"",
+  ""company"": ""Pho Saigon Express"",
+  ""email"": ""linh.tran@gmail.com"",
+  ""services_interested_in"": [""Google Ads""],
+  ""services_declined"": [""Website""],
+  ""goal"": ""Increase lunch traffic"",
+  ""budget"": {
+    ""amount"": 1200,
+    ""currency"": ""USD"",
+    ""approximate"": true
+  }
+}
+```"
+v1_baseline,case_08,True,False,False,"missing: ['business_name', 'contact_name', 'email', 'services', 'budget_usd', 'has_website']; extra keys: ['client_name', 'company', 'referral_source', 'services_requested', 'current_website', 'budget']; phone not string/null; industry not in allowed list",0,False,False,True,True,False,False,False,False,"```json
+{
+  ""client_name"": ""Sophie Laurent"",
+  ""company"": ""Laurent Law PLLC"",
+  ""industry"": ""Family law"",
+  ""referral_source"": ""Casa Maria"",
+  ""services_requested"": [
+    ""Full rebrand"",
+    ""New website"",
+    ""SEO""
+  ],
+  ""current_website"": {
+    ""exists"": true,
+    ""client_sentiment"": ""Dislikes it""
+  },
+  ""budget"": {
+    ""min"": 8000,
+    ""max"": 10000,
+    ""currency"": ""USD""
+  },
+  ""phone"": {
+    ""number"": ""346-555-0108"",
+    ""type"": ""Office""
+  }
+}
+```
+
+Notes on the extraction:
+- Currency is assumed to be USD based on the phone number format, but it isn't stated in the notes.
+- The budget ""8-10k"" was converted to numeric values of 8,000 and 10,000.
+- No email, address, or website URL was provided, so those fields are omitted."
+v1_baseline,case_09,True,False,False,"missing: ['contact_name', 'email', 'phone', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['owner', 'primary_contact', 'services_requested']",0,True,False,False,True,False,False,True,True,"```json
+{
+  ""business_name"": ""Benny's Auto Repair"",
+  ""owner"": ""Benny Alvarez"",
+  ""primary_contact"": {
+    ""name"": ""Rick"",
+    ""role"": ""Manager"",
+    ""responsibilities"": ""Handles marketing"",
+    ""email"": ""rick@bennysauto.com""
+  },
+  ""services_requested"": [
+    ""Google Business Profile"",
+    ""SEO""
+  ]
+}
+```
+
+Notes:
+- Rick's last name wasn't given, so only his first name is included.
+- Rick is the point of contact rather than the owner, so he's listed separately under `primary_contact`."
+v1_baseline,case_10,True,False,False,"missing: ['industry', 'services', 'budget_usd', 'has_website']; extra keys: ['current_website_status', 'request', 'budget']",0,True,True,True,True,False,False,False,False,"```json
+{
+  ""business_name"": ""Shear Elegance Salon"",
+  ""contact_name"": ""Tamika Johnson"",
+  ""phone"": ""832-555-0166"",
+  ""email"": null,
+  ""current_website_status"": ""No live website. Previous site went down last year and was never fixed."",
+  ""request"": ""Rebuild the website"",
+  ""budget"": ""Under $2,000""
+}
+```
+
+Notes:
+- The email address was not included in the notes, so it is set to `null`.
+- The budget was quoted as ""under 2k"", which I interpreted as under $2,000."
+v1_baseline,case_11,True,False,False,"missing: ['business_name', 'email', 'phone', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['client_name', 'contact_email', 'business_type', 'location', 'platform', 'services_interested_in']",0,False,True,False,True,False,False,True,False,"```json
+{
+  ""client_name"": ""Greenleaf Boutique"",
+  ""contact_name"": ""Rachel"",
+  ""contact_email"": ""info@greenleafboutique.com"",
+  ""business_type"": ""Women's clothing shop"",
+  ""location"": ""The Heights"",
+  ""platform"": ""Shopify"",
+  ""services_interested_in"": [
+    {
+      ""service"": ""SEO"",
+      ""timeline"": ""Immediate""
+    },
+    {
+      ""service"": ""Paid ads"",
+      ""timeline"": ""Next year""
+    }
+  ]
+}
+```
+
+Notes:
+- The timeline for SEO isn't stated explicitly. I marked it ""Immediate"" because it's phrased as a current need (""Looking for help""), so you may want to confirm.
+- ""The Heights"" is the only location detail given, so the city or state is unknown.
+- Rachel's last name and role weren't provided, and no phone number was included."
+v1_baseline,case_12,True,False,False,"missing: ['contact_name', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['name', 'business_type', 'website', 'needs', 'budget']",0,True,False,True,True,False,False,False,False,"```json
+{
+  ""name"": ""Mike Chen"",
+  ""business_name"": null,
+  ""business_type"": ""Meal prep company (launching)"",
+  ""website"": null,
+  ""needs"": [""logo"", ""website"", ""social media""],
+  ""budget"": 5000,
+  ""email"": ""mike.chen.mealprep@outlook.com"",
+  ""phone"": ""713-555-0190""
+}
+```
+
+Notes:
+- `business_name` is `null` because the notes say he doesn't have one yet.
+- `website` is `null` because he has no site yet.
+- `budget` is given as a plain number (5000). The notes don't specify a currency, so I left it unassumed."
+v1_baseline,case_13,True,False,False,"missing: ['business_name', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['title', 'company', 'current_system', 'requested_services', 'budget', 'lead_type']",0,False,True,True,True,False,False,False,True,"```json
+{
+  ""contact_name"": ""Sarah Okafor"",
+  ""title"": ""Operations Director"",
+  ""company"": ""Bayou City Plumbing"",
+  ""email"": ""sokafor@bayoucityplumbing.com"",
+  ""phone"": ""281-555-0133"",
+  ""current_system"": ""Spreadsheets"",
+  ""requested_services"": [
+    ""Zoho CRM setup"",
+    ""AI agent for after-hours calls""
+  ],
+  ""budget"": {
+    ""amount"": 6500,
+    ""currency"": ""USD"",
+    ""status"": ""Approved""
+  },
+  ""lead_type"": ""CRM migration""
+}
+```"
+v1_baseline,case_14,True,False,False,"missing: ['industry', 'services', 'budget_usd', 'has_website']; extra keys: ['project_needs', 'budget', 'budget_currency', 'budget_note', 'contact_method']",0,True,True,True,True,False,False,False,True,"```json
+{
+  ""contact_name"": ""Dre"",
+  ""business_name"": ""Fade Factory Barbershop"",
+  ""email"": null,
+  ""phone"": ""8325550111"",
+  ""project_needs"": ""Website where customers can book haircuts (online booking)"",
+  ""budget"": 1500,
+  ""budget_currency"": ""USD"",
+  ""budget_note"": ""Approximate; client said 'maybe 1500'"",
+  ""contact_method"": ""Text""
+}
+```
+
+Notes:
+- The email is `null` because the notes explicitly say none was provided.
+- Currency is assumed to be USD based on the area code (832, Houston, TX). The notes don't state it, so you may want to confirm.
+- The budget is a tentative figure, not a firm commitment."
+v1_baseline,case_15,True,False,False,"missing: ['business_name', 'contact_name', 'phone', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['name', 'company', 'budget', 'currency', 'service_requested']",0,False,False,True,True,False,False,False,False,"```json
+{
+  ""name"": ""Priya Shah"",
+  ""company"": ""Lotus Yoga Studio"",
+  ""email"": ""priya@lotusyogahtx.com"",
+  ""budget"": 3000,
+  ""currency"": ""USD"",
+  ""service_requested"": ""Website redesign""
+}
+```
+
+Notes on the extraction:
+- **Budget:** I used $3,000, which is Priya's own budget. The $10k figure was what her friend at another studio paid a different agency, so it doesn't apply to her.
+- **Currency:** The notes use ""$"" without specifying the currency, so USD is an assumption. The email domain suggests Houston, TX, but that's also an inference.
+- **Budget precision:** The notes say ""around 3k,"" so this is an approximate figure rather than a fixed amount."
+v1_baseline,case_16,True,False,False,"missing: ['business_name', 'contact_name', 'email', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['company_name', 'contact', 'interaction_type', 'current_marketing_status', 'requested_service', 'next_steps']",0,False,False,True,True,False,False,True,True,"```json
+{
+  ""company_name"": ""Westpark Chiropractic"",
+  ""contact"": {
+    ""name"": ""Ashley"",
+    ""role"": ""Front desk"",
+    ""notes"": ""Current point of contact; the doctor was not available""
+  },
+  ""phone"": ""713-555-0155"",
+  ""interaction_type"": ""Cold call"",
+  ""current_marketing_status"": ""Happy with current marketing"",
+  ""requested_service"": ""Quote for IT support for their computers"",
+  ""next_steps"": ""Prepare and send an IT support quote""
+}
+```
+
+Notes:
+- The last field (`next_steps`) is inferred from Ashley's quote request. It isn't stated explicitly in the notes.
+- No last name, email, address, or doctor's name was provided, so those fields are left out rather than guessed."
+v1_baseline,case_17,True,False,False,"missing: ['contact_name', 'email', 'phone', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['owner_name', 'current_marketing', 'goals', 'budget']",0,True,False,True,True,False,False,False,True,"```json
+{
+  ""business_name"": ""Golden Wok"",
+  ""owner_name"": ""James Liu"",
+  ""current_marketing"": ""DoorDash ads"",
+  ""goals"": [
+    ""Stop paying for DoorDash ads"",
+    ""Run own Google Ads campaigns"",
+    ""Build a simple online ordering website""
+  ],
+  ""budget"": {
+    ""website_build"": {
+      ""amount"": 3000,
+      ""currency"": ""USD"",
+      ""type"": ""one-time""
+    },
+    ""advertising"": {
+      ""amount"": 500,
+      ""currency"": ""USD"",
+      ""type"": ""monthly""
+    }
+  }
+}
+```"
+v1_baseline,case_18,True,False,False,"missing: ['business_name', 'contact_name', 'email', 'phone', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['client', 'needs', 'out_of_scope', 'budget', 'budget_note', 'goal']",0,False,False,False,True,False,False,True,True,"```json
+{
+  ""client"": {
+    ""name"": ""Carlos Mendez"",
+    ""company"": ""Mendez Accounting Group"",
+    ""email"": ""carlos@mendezcpa.com"",
+    ""source"": ""LinkedIn DM""
+  },
+  ""needs"": [
+    ""CRM"",
+    ""AI assistant to answer client FAQs""
+  ],
+  ""out_of_scope"": [
+    ""Website changes""
+  ],
+  ""budget"": null,
+  ""budget_note"": ""TBD"",
+  ""goal"": ""Modernize""
+}
+```"
+v1_baseline,case_19,True,False,False,"missing: ['business_name', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['company', 'services_requested', 'current_online_presence', 'budget']",0,False,True,True,True,False,False,False,False,"```json
+{
+  ""company"": ""Hailey & Co Realty"",
+  ""contact_name"": ""Hailey Brooks"",
+  ""phone"": ""832-555-0144"",
+  ""email"": ""hailey@haileyandco.com"",
+  ""services_requested"": [
+    ""Listing-focused website"",
+    ""Branding"",
+    ""Facebook ads""
+  ],
+  ""current_online_presence"": ""Zillow profile only; no website"",
+  ""budget"": 7500
+}
+```
+
+Notes:
+- The budget is stored as a number (7500). The notes did not specify a currency, so none is included.
+- I only included details that appear in the notes."
+v1_baseline,case_20,True,False,False,"missing: ['business_name', 'contact_name', 'email', 'phone', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['client_name', 'service_requested', 'monthly_budget', 'currency']",0,False,True,True,True,False,False,False,True,"```json
+{
+  ""client_name"": ""Smile Studio Ortho"",
+  ""service_requested"": ""SEO"",
+  ""monthly_budget"": 900,
+  ""currency"": ""USD""
+}
+```
+
+The note only contained the client name, service, and monthly price. I left out contact details, industry specifics, and timeline since they weren't mentioned. If you share more notes, I can add those fields."
+v1_baseline,case_21,True,False,False,"missing: ['business_name', 'contact_name', 'email', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['name', 'company', 'phone_extension', 'needs', 'has_existing_website', 'existing_website_notes', 'budget']",0,False,False,True,True,False,False,False,False,"```json
+{
+  ""name"": ""Gloria Ramirez"",
+  ""company"": ""Ramirez Roofing LLC"",
+  ""phone"": ""713-555-0102"",
+  ""phone_extension"": ""4"",
+  ""needs"": [""website"", ""SEO""],
+  ""has_existing_website"": true,
+  ""existing_website_notes"": ""Old GoDaddy site"",
+  ""budget"": {
+    ""min"": 4000,
+    ""max"": 6000,
+    ""currency"": ""USD""
+  }
+}
+```
+
+Notes on the choices I made:
+- The phone number and extension are split into separate fields so the number stays dialable.
+- Currency is assumed to be USD, based on the 713 area code (Houston, TX). The notes don't state it explicitly.
+- ""Has site? Yes (old GoDaddy one)"" is captured as a boolean plus a notes field for the detail."
+v1_baseline,case_22,True,False,False,"missing: ['business_name', 'contact_name', 'email', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['client_name', 'company', 'status', 'notes']",0,False,False,True,True,False,True,True,True,"```json
+{
+  ""client_name"": ""Omar"",
+  ""company"": ""Desert Rose Hookah Lounge"",
+  ""phone"": ""346 555 0181"",
+  ""status"": ""Not interested"",
+  ""notes"": ""Not interested in anything right now.""
+}
+```
+
+Only the details in the notes are included. No last name, email, or address was given, so I left those fields out instead of guessing."
+v1_baseline,case_23,True,False,False,"missing: ['business_name', 'contact_name', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['name', 'business', 'message', 'budget']",0,False,False,True,True,False,False,True,False,"```json
+{
+  ""name"": ""Jennifer Wu"",
+  ""business"": ""Wu Pediatrics"",
+  ""email"": ""JWU@WUPEDIATRICS.COM"",
+  ""phone"": ""+1 (713) 555-0170"",
+  ""message"": ""Need a new website and help with Google reviews/SEO. We have an outdated site."",
+  ""budget"": null
+}
+```
+
+Notes:
+- The `budget` field was empty in the form, so I set it to `null` rather than guessing.
+- I kept the email exactly as submitted. You may want to lowercase it (`jwu@wupediatrics.com`) before saving it to a CRM."
+v1_baseline,case_24,True,False,False,"missing: ['business_name', 'contact_name', 'email', 'phone', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['client_name', 'company', 'contact_method', 'requested_services', 'exclusions', 'budget']",0,False,False,True,True,False,False,False,True,"```json
+{
+  ""client_name"": ""Kyle"",
+  ""company"": ""Lone Star Lawn Care"",
+  ""contact_method"": ""text"",
+  ""requested_services"": [""flyers"", ""logo""],
+  ""exclusions"": [""online/digital services""],
+  ""budget"": {
+    ""amount"": 400,
+    ""currency"": ""USD""
+  }
+}
+```
+
+Notes on the extraction:
+- The last name, phone number, and email were not provided, so I left those fields out rather than guessing.
+- ""Nothing online"" is captured as an exclusion, meaning he doesn't want digital work such as a website or social media. If you'd like, I can fold that into a different field or drop it."
+v1_baseline,case_25,True,False,False,"missing: ['business_name', 'contact_name', 'email', 'phone', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['company', 'primary_contact', 'other_contacts', 'needs', 'budget']",0,False,False,False,True,False,False,False,True,"```json
+{
+  ""company"": ""Nimbus Logistics"",
+  ""primary_contact"": {
+    ""name"": ""Elena Petrova"",
+    ""title"": ""CEO"",
+    ""email"": ""elena@nimbuslogistics.io"",
+    ""is_decision_maker"": true
+  },
+  ""other_contacts"": [
+    {
+      ""name"": ""Sam Hart"",
+      ""title"": ""CTO"",
+      ""email"": null,
+      ""is_decision_maker"": null
+    }
+  ],
+  ""needs"": [
+    ""AI agent for dispatch updates"",
+    ""IT support/managed services""
+  ],
+  ""budget"": {
+    ""amount"": 15000,
+    ""currency"": null,
+    ""note"": ""Notes say '15k' without specifying currency""
+  }
+}
+```
+
+A few notes on the choices I made:
+- **Currency** is left as `null` since the notes don't specify it.
+- **Sam Hart's** email and decision-maker status weren't stated, so they are `null` rather than assumed. The notes only say Elena is the decision maker.
+- The email address appears to belong to Elena, since it follows her name in the notes and she is the point of contact."
+v1_baseline,case_26,True,False,False,"missing: ['business_name', 'contact_name', 'email', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['name', 'practice', 'city', 'state', 'services_interested', 'notes']",0,False,False,True,True,False,False,True,True,"```json
+{
+  ""name"": ""Dr. Angela Morris"",
+  ""practice"": ""Bright Smiles Dental"",
+  ""city"": ""Sugar Land"",
+  ""state"": null,
+  ""phone"": ""281-555-0119"",
+  ""services_interested"": [""paid ads""],
+  ""notes"": ""Not the same Dr. Park from a previous client; this is a different practice.""
+}
+```
+
+A few notes on the extraction:
+- The state wasn't stated, so I set it to `null` (Sugar Land is most likely in Texas, but I didn't infer it).
+- Dr. Park is not the client here. The note only says this is a different person, so I left Dr. Park out of the client fields."
+v1_baseline,case_27,True,False,False,"missing: ['business_name', 'contact_name', 'email', 'phone', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['client_name', 'contact', 'current_website_status', 'services_requested', 'budget']",0,False,False,True,True,False,False,False,False,"```json
+{
+  ""client_name"": ""CrossFit Iron Bayou"",
+  ""contact"": {
+    ""name"": ""Ben Torres"",
+    ""role"": ""Coach""
+  },
+  ""current_website_status"": ""Satisfied with current site"",
+  ""services_requested"": [
+    ""Instagram content"",
+    ""TikTok content"",
+    ""Meta ads""
+  ],
+  ""budget"": {
+    ""amount"": 1800,
+    ""currency"": ""USD"",
+    ""approximate"": true
+  }
+}
+```
+
+Notes:
+- The budget was written as ""~ $1.8k"", so I recorded it as approximately 1,800 USD. The notes don't say whether that's monthly, per project, or otherwise, so I left the billing period out.
+- No email, phone number, or location was given, so those fields are omitted rather than guessed."
+v1_baseline,case_28,True,False,False,"missing: ['business_name', 'contact_name', 'phone', 'industry', 'services', 'has_website']; extra keys: ['name', 'company', 'service_requested', 'notes']",0,False,False,True,True,False,False,True,True,"```json
+{
+  ""name"": ""Andrea Lopez"",
+  ""company"": ""Lopez Insurance Agency"",
+  ""email"": ""andrea@lopezinsures.com"",
+  ""service_requested"": ""Website"",
+  ""budget_usd"": 2000,
+  ""notes"": ""Also asked about payroll services, which we do not offer.""
+}
+```
+
+Note: The email domain ""lopezinsures.com"" is spelled as written in the notes (it differs from the company name ""Lopez Insurance""), so you may want to confirm it's correct."
+v1_baseline,case_29,True,False,False,"missing: ['industry', 'services', 'budget_usd', 'has_website']; extra keys: ['business_type', 'contact_role', 'current_website', 'services_requested', 'budget', 'currency']",0,True,True,True,True,False,False,False,False,"```json
+{
+  ""business_name"": ""Mama Ngozi's Kitchen"",
+  ""business_type"": ""Nigerian restaurant"",
+  ""contact_name"": ""Ngozi Adeyemi"",
+  ""contact_role"": ""Owner"",
+  ""phone"": ""832-555-0128"",
+  ""email"": null,
+  ""current_website"": false,
+  ""services_requested"": [
+    ""Website with menu"",
+    ""Google Business Profile/SEO"",
+    ""Instagram management""
+  ],
+  ""budget"": 3200,
+  ""currency"": null
+}
+```
+
+Notes on the extraction:
+- `email` is null because none was provided in the notes.
+- `currency` is null because the notes give the budget as ""3,200"" with no currency symbol or code. It is likely USD given the 832 area code (Houston), but that is an assumption, so I left it unset.
+- `current_website` is false based on ""No current site."""
+v1_baseline,case_30,True,False,False,"missing: ['contact_name', 'email', 'phone', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['owner_name', 'contact', 'needs']",0,True,True,True,True,False,False,True,True,"```json
+{
+  ""business_name"": ""Glamour Lash Bar"",
+  ""owner_name"": null,
+  ""contact"": {
+    ""instagram"": ""@glamourlashbar"",
+    ""email"": null,
+    ""phone"": null
+  },
+  ""needs"": [""booking site""]
+}
+```
+
+Notes:
+- The owner's name wasn't given in the notes, so it is `null` rather than guessed.
+- Instagram is the only contact detail available. Email and phone are `null`."
+v1_baseline,case_31,True,False,False,"missing: ['business_name', 'contact_name', 'phone', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['name', 'company', 'needs', 'budget']",0,False,False,True,True,False,False,False,True,"```json
+{
+  ""name"": ""Patrick O'Neill"",
+  ""company"": ""O'Neill Electric"",
+  ""email"": ""patrick@oneillelectric.com"",
+  ""needs"": [
+    ""AI receptionist"",
+    ""CRM""
+  ],
+  ""budget"": {
+    ""amount"": 5000,
+    ""currency"": ""USD"",
+    ""original_text"": ""five grand""
+  }
+}
+```
+
+Note: The currency is assumed to be USD, since the notes don't state it explicitly."
+v1_baseline,case_32,True,False,False,"missing: ['business_name', 'contact_name', 'phone', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['client_name', 'company', 'current_services', 'requested_services', 'additional_budget', 'currency']",0,False,False,True,True,False,False,False,False,"```json
+{
+  ""client_name"": ""Natalie Kim"",
+  ""company"": ""Serenity MedSpa"",
+  ""email"": ""natalie@serenitymedspa.com"",
+  ""current_services"": [""Social media plan""],
+  ""requested_services"": [""Paid ads"", ""Website refresh""],
+  ""additional_budget"": 2000,
+  ""currency"": ""USD""
+}
+```
+
+Notes:
+- The currency is assumed to be USD based on the ""$"" symbol, since the notes don't state it explicitly.
+- No phone number, timeline, or existing plan cost was mentioned, so those fields are left out."
+v1_baseline,case_33,True,False,False,"missing: ['business_name', 'contact_name', 'services', 'budget_usd', 'has_website']; extra keys: ['client_name', 'company', 'company_size', 'services_requested', 'budget']; industry not in allowed list",0,False,False,True,True,False,False,True,True,"```json
+{
+  ""client_name"": ""Ruth Mbeki"",
+  ""company"": ""Mbeki Legal"",
+  ""industry"": ""Legal"",
+  ""company_size"": ""3 people"",
+  ""phone"": ""713-555-0137"",
+  ""email"": null,
+  ""services_requested"": [
+    ""Cybersecurity"",
+    ""General IT support""
+  ],
+  ""budget"": null
+}
+```
+
+Notes:
+- The budget is listed as unknown in the notes, so it is set to `null`.
+- No email address was provided, so that is also `null`.
+- Industry is inferred from ""law office"" and the firm name."
+v1_baseline,case_34,True,False,False,"missing: ['contact_name', 'email', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['client_name', 'business_type', 'lead_source', 'project_request', 'budget', 'preferred_contact_method']",0,True,False,True,True,False,False,False,True,"```json
+{
+  ""client_name"": ""Lou"",
+  ""business_name"": ""Smokin Bayou BBQ"",
+  ""business_type"": ""Food truck"",
+  ""phone"": ""2815550193"",
+  ""lead_source"": ""Thumbtack"",
+  ""project_request"": ""Website for food truck"",
+  ""budget"": ""$1,000"",
+  ""preferred_contact_method"": ""Text""
+}
+```"
+v1_baseline,case_35,True,False,False,"missing: ['business_name', 'phone', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['company', 'requested_services', 'current_situation', 'budget']",0,False,True,True,True,False,False,False,False,"```json
+{
+  ""company"": ""Precision Auto Detailing"",
+  ""contact_name"": ""Victor Nguyen"",
+  ""email"": ""victor@precisiondetail.net"",
+  ""requested_services"": [
+    ""Website with online booking"",
+    ""AI chatbot""
+  ],
+  ""current_situation"": ""Existing website built by his cousin is broken and offline"",
+  ""budget"": ""$3,500""
+}
+```"
+v1_baseline,case_36,True,False,False,"missing: ['business_name', 'contact_name', 'email', 'phone', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['company', 'contacts', 'interests', 'budget', 'notes']",0,False,False,False,True,False,False,True,False,"```json
+{
+  ""company"": ""Haven Real Estate Partners"",
+  ""contacts"": [
+    {
+      ""name"": ""Lisa"",
+      ""email"": ""lisa@havenrep.com"",
+      ""role"": ""Agent"",
+      ""is_primary_contact"": true
+    },
+    {
+      ""name"": ""Mark"",
+      ""email"": null,
+      ""role"": ""Agent"",
+      ""is_primary_contact"": false
+    }
+  ],
+  ""interests"": [""Branding refresh""],
+  ""budget"": null,
+  ""notes"": ""Budget not discussed. Current website is described as 'ok'.""
+}
+```
+
+Notes on the extraction:
+- Lisa is marked as the primary contact because the notes say she is leading the project and is your contact.
+- Mark's email isn't in the notes, so it's `null`.
+- Budget is `null` because it wasn't discussed. I didn't want to imply a figure or a ""none.""
+- Both are described as agents, so I used that as their role. Last names weren't provided."
+v1_baseline,case_37,True,False,False,"missing: ['business_name', 'email', 'phone', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['company_name', 'service_interest', 'budget', 'notes']",0,False,True,True,True,False,False,False,True,"```json
+{
+  ""company_name"": ""Bluebonnet Bakery"",
+  ""contact_name"": null,
+  ""service_interest"": ""website"",
+  ""budget"": {
+    ""low"": 2000,
+    ""high"": 3000,
+    ""currency"": null,
+    ""confidence"": ""low""
+  },
+  ""notes"": ""Bad connection during call. Contact name could not be obtained. Budget was approximate ('maybe 2 or 3 thousand'). Currency was not stated. Details of the website project (new build, redesign, etc.) were unclear.""
+}
+```
+
+I left `contact_name` and `currency` as `null` because the notes don't say, and I didn't want to guess. A follow-up to confirm the contact name, the project scope, and the budget would be worthwhile."
+v1_baseline,case_38,True,False,False,"missing: ['business_name', 'contact_name', 'email', 'phone', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['client', 'inquiry']",0,False,False,False,False,False,False,True,True,"```json
+{
+  ""client"": {
+    ""name"": ""Dr. Samuel Osei"",
+    ""title"": ""DDS"",
+    ""company"": ""Osei Dental Care"",
+    ""phone"": ""832-555-0150"",
+    ""email"": ""sam@oseidental.com""
+  },
+  ""inquiry"": {
+    ""services_requested"": [
+      ""SEO"",
+      ""Facebook page management""
+    ],
+    ""request"": ""Pricing for the requested services"",
+    ""source"": ""Inbound email""
+  }
+}
+```"
+v1_baseline,case_39,True,False,False,"missing: ['email', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['services_wanted', 'exclusions', 'existing_website']",0,True,True,True,True,False,False,True,False,"```json
+{
+  ""business_name"": ""Nails by Kim"",
+  ""contact_name"": ""Kim Pham"",
+  ""phone"": ""346-555-0163"",
+  ""services_wanted"": [""Instagram growth""],
+  ""exclusions"": [""Ads""],
+  ""existing_website"": {
+    ""has_website"": true,
+    ""platform"": ""Square"",
+    ""description"": ""Basic site""
+  }
+}
+```"
+v1_baseline,case_40,True,False,False,"missing: ['business_name', 'contact_name', 'email', 'phone', 'industry', 'services', 'budget_usd', 'has_website']; extra keys: ['company', 'contact', 'needs', 'budget']",0,False,False,False,False,False,False,False,False,"```json
+{
+  ""company"": ""Rivera Family Medicine"",
+  ""contact"": {
+    ""name"": ""Dr. Luis Rivera"",
+    ""email"": ""luis.rivera@riverafm.com"",
+    ""phone"": ""713-555-0146""
+  },
+  ""needs"": [
+    ""HIPAA-compliant IT support"",
+    ""Website redesign""
+  ],
+  ""budget"": {
+    ""description"": ""around 12k total"",
+    ""amount_usd"": 12000,
+    ""approximate"": true
+  }
+}
+```
+
+Notes on the extraction:
+- The notes say ""HIPAA-friendly"" IT support. I normalized this to ""HIPAA-compliant"" in the output, so change it back if you want the original wording preserved.
+- The budget is stored both as the original phrase and as an approximate numeric value, since the notes say ""around 12k total"" rather than a firm figure."
+v2_schema,case_01,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,False,False,True,True,"{""business_name"":""Casa Maria Taqueria"",""contact_name"":""Maria Gonzalez"",""email"":""maria@casamariatx.com"",""phone"":""713-555-0142"",""industry"":""Restaurant"",""services"":[""website design"",""online ordering"",""social media""],""budget_usd"":5000,""has_website"":true}"
+v2_schema,case_02,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,True,False,True,True,"{""business_name"":""Park Family Dental"",""contact_name"":""Dr. Kevin Park"",""email"":""kpark@parkfamilydental.com"",""phone"":null,""industry"":""Dental"",""services"":[""SEO"",""Google Ads""],""budget_usd"":null,""has_website"":true}"
+v2_schema,case_03,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,False,False,False,True,"{""business_name"":""Glow Lab Med Spa"",""contact_name"":""Jasmine"",""email"":null,""phone"":""832.555.0199"",""industry"":""Med spa"",""services"":[""brand refresh"",""new logo"",""Instagram strategy""],""budget_usd"":null,""has_website"":false}"
+v2_schema,case_04,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,True,False,True,True,"{""business_name"":""Russo & Sons Construction"",""contact_name"":""Tony Russo"",""email"":""tony@russoandsons.com"",""phone"":""(281) 555-0177"",""industry"":""Construction"",""services"":[""CRM"",""IT support""],""budget_usd"":null,""has_website"":null}"
+v2_schema,case_05,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,True,False,True,True,"{""business_name"":""Ironside Fitness"",""contact_name"":""Dana Whitfield"",""email"":""dana@ironsidefit.co"",""phone"":null,""industry"":""Fitness"",""services"":[""AI chatbot for class booking"",""lead follow-up""],""budget_usd"":2500,""has_website"":true}"
+v2_schema,case_06,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,False,False,True,True,"{""business_name"":""Bell Realty Group"",""contact_name"":""Marcus Bell"",""email"":null,""phone"":""713-555-0123"",""industry"":""Real estate"",""services"":[""website development"",""social media management (Facebook)"",""social media management (Instagram)""],""budget_usd"":null,""has_website"":null}"
+v2_schema,case_07,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,False,False,True,True,"{
+  ""business_name"": ""Pho Saigon Express"",
+  ""contact_name"": ""Linh Tran"",
+  ""email"": ""linh.tran@gmail.com"",
+  ""phone"": null,
+  ""industry"": ""Restaurant"",
+  ""services"": [""Google Ads""],
+  ""budget_usd"": 1200,
+  ""has_website"": null
+}"
+v2_schema,case_08,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,False,False,False,True,"{""business_name"":""Laurent Law PLLC"",""contact_name"":""Sophie Laurent"",""email"":null,""phone"":""346-555-0108"",""industry"":""family law"",""services"":[""rebrand"",""new website"",""SEO""],""budget_usd"":null,""has_website"":true}"
+v2_schema,case_09,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,False,False,True,True,"{
+  ""business_name"": ""Benny's Auto Repair"",
+  ""contact_name"": ""Rick"",
+  ""email"": ""rick@bennysauto.com"",
+  ""phone"": null,
+  ""industry"": ""Automotive repair"",
+  ""services"": [""Google Business Profile"", ""SEO""],
+  ""budget_usd"": null,
+  ""has_website"": null
+}"
+v2_schema,case_10,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,False,False,True,True,"{""business_name"":""Shear Elegance Salon"",""contact_name"":""Tamika Johnson"",""email"":null,""phone"":""832-555-0166"",""industry"":""Beauty salon"",""services"":[""website rebuild""],""budget_usd"":2000,""has_website"":false}"
+v2_schema,case_11,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,False,False,True,True,"{""business_name"":""Greenleaf Boutique"",""contact_name"":""Rachel"",""email"":""info@greenleafboutique.com"",""phone"":null,""industry"":""Women's clothing retail"",""services"":[""SEO"",""paid ads""],""budget_usd"":null,""has_website"":true}"
+v2_schema,case_12,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,False,False,True,True,"{""business_name"": null, ""contact_name"": ""Mike Chen"", ""email"": ""mike.chen.mealprep@outlook.com"", ""phone"": ""713-555-0190"", ""industry"": ""Meal prep / food service"", ""services"": [""logo design"", ""website design"", ""social media setup""], ""budget_usd"": 5000, ""has_website"": false}"
+v2_schema,case_13,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,False,False,True,True,"{""business_name"":""Bayou City Plumbing"",""contact_name"":""Sarah Okafor"",""email"":""sokafor@bayoucityplumbing.com"",""phone"":""281-555-0133"",""industry"":""Plumbing"",""services"":[""Zoho CRM setup"",""CRM migration"",""AI agent for after-hours calls""],""budget_usd"":6500,""has_website"":null}"
+v2_schema,case_14,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,False,False,True,True,"{""business_name"":""Fade Factory Barbershop"",""contact_name"":""Dre"",""email"":null,""phone"":""8325550111"",""industry"":""Barbershop"",""services"":[""website development"",""online booking""],""budget_usd"":1500,""has_website"":null}"
+v2_schema,case_15,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,False,False,True,True,"{""business_name"":""Lotus Yoga Studio"",""contact_name"":""Priya Shah"",""email"":""priya@lotusyogahtx.com"",""phone"":null,""industry"":""Yoga studio / fitness and wellness"",""services"":[""website redesign""],""budget_usd"":3000,""has_website"":true}"
+v2_schema,case_16,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,False,False,True,True,"{""business_name"":""Westpark Chiropractic"",""contact_name"":""Ashley"",""email"":null,""phone"":""713-555-0155"",""industry"":""Chiropractic"",""services"":[""IT support""],""budget_usd"":null,""has_website"":null}"
+v2_schema,case_17,True,True,False,industry not in allowed list; services contain unknown values,1,True,True,True,True,False,False,True,False,"{""business_name"":""Golden Wok"",""contact_name"":""James Liu"",""email"":null,""phone"":null,""industry"":""Restaurant"",""services"":[""Google Ads"",""website design/build (online ordering site)""],""budget_usd"":3000,""has_website"":false}"
+v2_schema,case_18,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,False,False,True,True,"{""business_name"":""Mendez Accounting Group"",""contact_name"":""Carlos Mendez"",""email"":""carlos@mendezcpa.com"",""phone"":null,""industry"":""Accounting"",""services"":[""CRM"",""AI assistant for client FAQs""],""budget_usd"":null,""has_website"":null}"
+v2_schema,case_19,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,False,False,True,True,"{""business_name"":""Hailey & Co Realty"",""contact_name"":""Hailey Brooks"",""email"":""hailey@haileyandco.com"",""phone"":""832-555-0144"",""industry"":""Real estate"",""services"":[""website design"",""branding"",""Facebook ads""],""budget_usd"":7500,""has_website"":false}"
+v2_schema,case_20,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,False,True,True,True,"{""business_name"":""Smile Studio Ortho"",""contact_name"":null,""email"":null,""phone"":null,""industry"":""Orthodontics"",""services"":[""SEO""],""budget_usd"":900,""has_website"":null}"
+v2_schema,case_21,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,False,False,True,True,True,"{""business_name"":""Ramirez Roofing LLC"",""contact_name"":""Gloria Ramirez"",""email"":null,""phone"":""713-555-0102 ext 4"",""industry"":""Roofing"",""services"":[""website"",""SEO""],""budget_usd"":4000,""has_website"":true}"
+v2_schema,case_22,True,True,False,industry not in allowed list,0,True,True,True,True,False,True,True,True,"{""business_name"":""Desert Rose Hookah Lounge"",""contact_name"":""Omar"",""email"":null,""phone"":""346 555 0181"",""industry"":""Hookah lounge"",""services"":[],""budget_usd"":null,""has_website"":null}"
+v2_schema,case_23,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,False,False,True,True,"{""business_name"":""Wu Pediatrics"",""contact_name"":""Jennifer Wu"",""email"":""JWU@WUPEDIATRICS.COM"",""phone"":""+1 (713) 555-0170"",""industry"":""Pediatrics / Healthcare"",""services"":[""website design"",""Google reviews management"",""SEO""],""budget_usd"":null,""has_website"":true}"
+v2_schema,case_24,True,True,False,industry not in allowed list; services contain unknown values,1,True,True,True,True,False,False,True,False,"{""business_name"":""Lone Star Lawn Care"",""contact_name"":""Kyle"",""email"":null,""phone"":null,""industry"":""Lawn care"",""services"":[""flyers"",""logo design""],""budget_usd"":400,""has_website"":false}"
+v2_schema,case_25,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,False,False,True,True,"{""business_name"":""Nimbus Logistics"",""contact_name"":""Elena Petrova"",""email"":""elena@nimbuslogistics.io"",""phone"":null,""industry"":""Logistics"",""services"":[""AI agent for dispatch updates"",""IT support"",""managed services""],""budget_usd"":15000,""has_website"":null}"
+v2_schema,case_26,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,True,False,True,True,"{""business_name"":""Bright Smiles Dental"",""contact_name"":""Dr. Angela Morris"",""email"":null,""phone"":""281-555-0119"",""industry"":""Dental"",""services"":[""paid ads""],""budget_usd"":null,""has_website"":null}"
+v2_schema,case_27,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,True,False,True,True,"{""business_name"":""CrossFit Iron Bayou"",""contact_name"":""Ben Torres"",""email"":null,""phone"":null,""industry"":""Fitness"",""services"":[""Instagram content"",""TikTok content"",""Meta ads""],""budget_usd"":1800,""has_website"":true}"
+v2_schema,case_28,True,True,False,industry not in allowed list,1,True,True,True,True,False,True,True,False,"{""business_name"":""Lopez Insurance Agency"",""contact_name"":""Andrea Lopez"",""email"":""andrea@lopezinsures.com"",""phone"":null,""industry"":""Insurance"",""services"":[""website""],""budget_usd"":2000,""has_website"":false}"
+v2_schema,case_29,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,False,False,True,True,"{""business_name"":""Mama Ngozi's Kitchen"",""contact_name"":""Ngozi Adeyemi"",""email"":null,""phone"":""832-555-0128"",""industry"":""Restaurant"",""services"":[""Website design with menu"",""Google Business Profile/SEO"",""Instagram management""],""budget_usd"":3200,""has_website"":false}"
+v2_schema,case_30,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,False,False,True,True,"{""business_name"":""Glamour Lash Bar"",""contact_name"":null,""email"":null,""phone"":null,""industry"":""Beauty / Lash salon"",""services"":[""booking website""],""budget_usd"":null,""has_website"":null}"
+v2_schema,case_31,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,False,False,True,True,"{
+  ""business_name"": ""O'Neill Electric"",
+  ""contact_name"": ""Patrick O'Neill"",
+  ""email"": ""patrick@oneillelectric.com"",
+  ""phone"": null,
+  ""industry"": ""Electrical contracting"",
+  ""services"": [""AI receptionist"", ""CRM setup""],
+  ""budget_usd"": 5000,
+  ""has_website"": null
+}"
+v2_schema,case_32,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,False,False,True,True,"{""business_name"":""Serenity MedSpa"",""contact_name"":""Natalie Kim"",""email"":""natalie@serenitymedspa.com"",""phone"":null,""industry"":""Medical spa"",""services"":[""social media management"",""paid ads"",""website refresh""],""budget_usd"":2000,""has_website"":true}"
+v2_schema,case_33,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,False,False,True,True,"{""business_name"":""Mbeki Legal"",""contact_name"":""Ruth Mbeki"",""email"":null,""phone"":""713-555-0137"",""industry"":""Legal"",""services"":[""cybersecurity"",""IT support""],""budget_usd"":null,""has_website"":null}"
+v2_schema,case_34,True,True,False,industry not in allowed list; services contain unknown values,1,True,True,True,True,False,False,True,False,"{""business_name"":""Smokin Bayou BBQ"",""contact_name"":""Lou"",""email"":null,""phone"":""2815550193"",""industry"":""Food truck / BBQ"",""services"":[""website design""],""budget_usd"":1000,""has_website"":false}"
+v2_schema,case_35,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,False,False,True,True,"{""business_name"":""Precision Auto Detailing"",""contact_name"":""Victor Nguyen"",""email"":""victor@precisiondetail.net"",""phone"":null,""industry"":""Auto detailing"",""services"":[""website development"",""online booking"",""AI chatbot""],""budget_usd"":3500,""has_website"":false}"
+v2_schema,case_36,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,False,False,True,True,"{""business_name"":""Haven Real Estate Partners"",""contact_name"":""Lisa"",""email"":""lisa@havenrep.com"",""phone"":null,""industry"":""Real estate"",""services"":[""branding refresh""],""budget_usd"":null,""has_website"":true}"
+v2_schema,case_37,True,True,False,industry not in allowed list,0,True,True,True,True,False,True,False,True,"{""business_name"":""Bluebonnet Bakery"",""contact_name"":null,""email"":null,""phone"":null,""industry"":""Bakery"",""services"":[""website""],""budget_usd"":2500,""has_website"":null}"
+v2_schema,case_38,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,True,False,True,True,"{""business_name"":""Osei Dental Care"",""contact_name"":""Dr. Samuel Osei"",""email"":""sam@oseidental.com"",""phone"":""832-555-0150"",""industry"":""Dental"",""services"":[""SEO"",""Facebook page management""],""budget_usd"":null,""has_website"":null}"
+v2_schema,case_39,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,False,False,True,True,"{""business_name"":""Nails by Kim"",""contact_name"":""Kim Pham"",""email"":null,""phone"":""346-555-0163"",""industry"":""Nail salon"",""services"":[""Instagram growth""],""budget_usd"":null,""has_website"":true}"
+v2_schema,case_40,True,True,False,industry not in allowed list; services contain unknown values,0,True,True,True,True,True,False,True,True,"{""business_name"":""Rivera Family Medicine"",""contact_name"":""Dr. Luis Rivera"",""email"":""luis.rivera@riverafm.com"",""phone"":""713-555-0146"",""industry"":""Healthcare"",""services"":[""HIPAA-friendly IT support"",""website redesign""],""budget_usd"":12000,""has_website"":true}"
+v3_rules_fewshot,case_01,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Casa Maria Taqueria"",""contact_name"":""Maria Gonzalez"",""email"":""maria@casamariatx.com"",""phone"":""7135550142"",""industry"":""food_and_beverage"",""services"":[""website""],""budget_usd"":5000,""has_website"":true}"
+v3_rules_fewshot,case_02,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Park Family Dental"",""contact_name"":""Kevin Park"",""email"":""kpark@parkfamilydental.com"",""phone"":null,""industry"":""dental"",""services"":[""seo"",""paid_ads""],""budget_usd"":null,""has_website"":true}"
+v3_rules_fewshot,case_03,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Glow Lab Med Spa"",""contact_name"":""Jasmine"",""email"":null,""phone"":""8325550199"",""industry"":""med_spa"",""services"":[""branding"",""social_media""],""budget_usd"":3000,""has_website"":false}"
+v3_rules_fewshot,case_04,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Russo & Sons Construction"",""contact_name"":""Tony Russo"",""email"":""tony@russoandsons.com"",""phone"":""2815550177"",""industry"":""construction"",""services"":[""crm"",""it_support""],""budget_usd"":null,""has_website"":null}"
+v3_rules_fewshot,case_05,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Ironside Fitness"",""contact_name"":""Dana Whitfield"",""email"":""dana@ironsidefit.co"",""phone"":null,""industry"":""fitness"",""services"":[""ai_agent""],""budget_usd"":2500,""has_website"":true}"
+v3_rules_fewshot,case_06,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Bell Realty Group"",""contact_name"":""Marcus Bell"",""email"":null,""phone"":""7135550123"",""industry"":""real_estate"",""services"":[""website"",""social_media""],""budget_usd"":null,""has_website"":null}"
+v3_rules_fewshot,case_07,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Pho Saigon Express"",""contact_name"":""Linh Tran"",""email"":""linh.tran@gmail.com"",""phone"":null,""industry"":""food_and_beverage"",""services"":[""paid_ads""],""budget_usd"":1200,""has_website"":null}"
+v3_rules_fewshot,case_08,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Laurent Law PLLC"",""contact_name"":""Sophie Laurent"",""email"":null,""phone"":""3465550108"",""industry"":""law_firm"",""services"":[""branding"",""website"",""seo""],""budget_usd"":8000,""has_website"":true}"
+v3_rules_fewshot,case_09,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Benny's Auto Repair"",""contact_name"":""Rick"",""email"":""rick@bennysauto.com"",""phone"":null,""industry"":""auto"",""services"":[""seo""],""budget_usd"":null,""has_website"":null}"
+v3_rules_fewshot,case_10,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Shear Elegance Salon"",""contact_name"":""Tamika Johnson"",""email"":null,""phone"":""8325550166"",""industry"":""beauty"",""services"":[""website""],""budget_usd"":2000,""has_website"":false}"
+v3_rules_fewshot,case_11,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Greenleaf Boutique"",""contact_name"":""Rachel"",""email"":""info@greenleafboutique.com"",""phone"":null,""industry"":""retail"",""services"":[""seo""],""budget_usd"":null,""has_website"":true}"
+v3_rules_fewshot,case_12,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":null,""contact_name"":""Mike Chen"",""email"":""mike.chen.mealprep@outlook.com"",""phone"":""7135550190"",""industry"":""food_and_beverage"",""services"":[""branding"",""website"",""social_media""],""budget_usd"":5000,""has_website"":false}"
+v3_rules_fewshot,case_13,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Bayou City Plumbing"",""contact_name"":""Sarah Okafor"",""email"":""sokafor@bayoucityplumbing.com"",""phone"":""2815550133"",""industry"":""home_services"",""services"":[""crm"",""ai_agent""],""budget_usd"":6500,""has_website"":null}"
+v3_rules_fewshot,case_14,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Fade Factory Barbershop"",""contact_name"":""Dre"",""email"":null,""phone"":""8325550111"",""industry"":""beauty"",""services"":[""website""],""budget_usd"":1500,""has_website"":null}"
+v3_rules_fewshot,case_15,True,True,True,,0,True,True,True,True,True,True,True,False,"{""business_name"":""Lotus Yoga Studio"",""contact_name"":""Priya Shah"",""email"":""priya@lotusyogahtx.com"",""phone"":null,""industry"":""fitness"",""services"":[""website""],""budget_usd"":3000,""has_website"":null}"
+v3_rules_fewshot,case_16,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Westpark Chiropractic"",""contact_name"":""Ashley"",""email"":null,""phone"":""7135550155"",""industry"":""healthcare"",""services"":[""it_support""],""budget_usd"":null,""has_website"":null}"
+v3_rules_fewshot,case_17,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Golden Wok"",""contact_name"":""James Liu"",""email"":null,""phone"":null,""industry"":""food_and_beverage"",""services"":[""website"",""paid_ads""],""budget_usd"":3000,""has_website"":null}"
+v3_rules_fewshot,case_18,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Mendez Accounting Group"",""contact_name"":""Carlos Mendez"",""email"":""carlos@mendezcpa.com"",""phone"":null,""industry"":""professional_services"",""services"":[""crm"",""ai_agent""],""budget_usd"":null,""has_website"":null}"
+v3_rules_fewshot,case_19,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Hailey & Co Realty"",""contact_name"":""Hailey Brooks"",""email"":""hailey@haileyandco.com"",""phone"":""8325550144"",""industry"":""real_estate"",""services"":[""website"",""branding"",""paid_ads""],""budget_usd"":7500,""has_website"":false}"
+v3_rules_fewshot,case_20,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Smile Studio Ortho"",""contact_name"":null,""email"":null,""phone"":null,""industry"":""dental"",""services"":[""seo""],""budget_usd"":900,""has_website"":null}"
+v3_rules_fewshot,case_21,True,True,True,,0,True,True,True,True,False,True,True,True,"{""business_name"":""Ramirez Roofing LLC"",""contact_name"":""Gloria Ramirez"",""email"":null,""phone"":""7135550102"",""industry"":""home_services"",""services"":[""website"",""seo""],""budget_usd"":4000,""has_website"":true}"
+v3_rules_fewshot,case_22,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Desert Rose Hookah Lounge"",""contact_name"":""Omar"",""email"":null,""phone"":""3465550181"",""industry"":""food_and_beverage"",""services"":[],""budget_usd"":null,""has_website"":null}"
+v3_rules_fewshot,case_23,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Wu Pediatrics"",""contact_name"":""Jennifer Wu"",""email"":""jwu@wupediatrics.com"",""phone"":""7135550170"",""industry"":""healthcare"",""services"":[""website"",""seo""],""budget_usd"":null,""has_website"":true}"
+v3_rules_fewshot,case_24,True,True,True,,1,True,True,True,True,True,True,True,False,"{""business_name"":""Lone Star Lawn Care"",""contact_name"":""Kyle"",""email"":null,""phone"":null,""industry"":""home_services"",""services"":[""branding""],""budget_usd"":400,""has_website"":false}"
+v3_rules_fewshot,case_25,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Nimbus Logistics"",""contact_name"":""Elena Petrova"",""email"":""elena@nimbuslogistics.io"",""phone"":null,""industry"":""other"",""services"":[""ai_agent"",""it_support""],""budget_usd"":15000,""has_website"":null}"
+v3_rules_fewshot,case_26,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Bright Smiles Dental"",""contact_name"":""Angela Morris"",""email"":null,""phone"":""2815550119"",""industry"":""dental"",""services"":[""paid_ads""],""budget_usd"":null,""has_website"":null}"
+v3_rules_fewshot,case_27,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""CrossFit Iron Bayou"",""contact_name"":""Ben Torres"",""email"":null,""phone"":null,""industry"":""fitness"",""services"":[""social_media"",""paid_ads""],""budget_usd"":1800,""has_website"":true}"
+v3_rules_fewshot,case_28,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Lopez Insurance Agency"",""contact_name"":""Andrea Lopez"",""email"":""andrea@lopezinsures.com"",""phone"":null,""industry"":""professional_services"",""services"":[""website""],""budget_usd"":2000,""has_website"":null}"
+v3_rules_fewshot,case_29,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Mama Ngozi's Kitchen"",""contact_name"":""Ngozi Adeyemi"",""email"":null,""phone"":""8325550128"",""industry"":""food_and_beverage"",""services"":[""website"",""seo"",""social_media""],""budget_usd"":3200,""has_website"":false}"
+v3_rules_fewshot,case_30,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Glamour Lash Bar"",""contact_name"":null,""email"":null,""phone"":null,""industry"":""beauty"",""services"":[""website""],""budget_usd"":null,""has_website"":null}"
+v3_rules_fewshot,case_31,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""O'Neill Electric"",""contact_name"":""Patrick O'Neill"",""email"":""patrick@oneillelectric.com"",""phone"":null,""industry"":""home_services"",""services"":[""ai_agent"",""crm""],""budget_usd"":5000,""has_website"":null}"
+v3_rules_fewshot,case_32,True,False,True,,0,True,True,True,True,True,True,True,False,"{""business_name"":""Serenity MedSpa"",""contact_name"":""Natalie Kim"",""email"":""natalie@serenitymedspa.com"",""phone"":null,""industry"":""med_spa"",""services"":[""paid_ads"",""website""],""budget_usd"":2000,""has_website"":null}
+
+Wait—the ""website refresh"" implies an existing site, but I'll keep to the rules: a refresh strongly suggests one exists, yet it isn't explicitly stated."
+v3_rules_fewshot,case_33,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Mbeki Legal"",""contact_name"":""Ruth Mbeki"",""email"":null,""phone"":""7135550137"",""industry"":""law_firm"",""services"":[""it_support""],""budget_usd"":null,""has_website"":null}"
+v3_rules_fewshot,case_34,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Smokin Bayou BBQ"",""contact_name"":""Lou"",""email"":null,""phone"":""2815550193"",""industry"":""food_and_beverage"",""services"":[""website""],""budget_usd"":1000,""has_website"":null}"
+v3_rules_fewshot,case_35,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Precision Auto Detailing"",""contact_name"":""Victor Nguyen"",""email"":""victor@precisiondetail.net"",""phone"":null,""industry"":""auto"",""services"":[""website"",""ai_agent""],""budget_usd"":3500,""has_website"":false}"
+v3_rules_fewshot,case_36,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Haven Real Estate Partners"",""contact_name"":""Lisa"",""email"":""lisa@havenrep.com"",""phone"":null,""industry"":""real_estate"",""services"":[""branding""],""budget_usd"":null,""has_website"":true}"
+v3_rules_fewshot,case_37,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Bluebonnet Bakery"",""contact_name"":null,""email"":null,""phone"":null,""industry"":""food_and_beverage"",""services"":[""website""],""budget_usd"":2000,""has_website"":null}"
+v3_rules_fewshot,case_38,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Osei Dental Care"",""contact_name"":""Samuel Osei"",""email"":""sam@oseidental.com"",""phone"":""8325550150"",""industry"":""dental"",""services"":[""seo"",""social_media""],""budget_usd"":null,""has_website"":null}"
+v3_rules_fewshot,case_39,True,True,True,,0,True,True,True,True,True,True,True,True,"{""business_name"":""Nails by Kim"",""contact_name"":""Kim Pham"",""email"":null,""phone"":""3465550163"",""industry"":""beauty"",""services"":[""social_media""],""budget_usd"":null,""has_website"":true}"
+v3_rules_fewshot,case_40,True,True,True,,0,True,True,True,True,True,True,True,False,"{""business_name"":""Rivera Family Medicine"",""contact_name"":""Luis Rivera"",""email"":""luis.rivera@riverafm.com"",""phone"":""7135550146"",""industry"":""healthcare"",""services"":[""website"",""it_support""],""budget_usd"":12000,""has_website"":null}"
