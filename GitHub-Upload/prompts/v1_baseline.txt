@@ -1,4 +1,0 @@
-Extract the client information from these sales notes and return it as JSON.
-
-Notes:
-{notes}
