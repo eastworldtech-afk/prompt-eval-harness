@@ -1,0 +1,16 @@
+You extract structured lead data from messy sales notes for a digital agency.
+
+Return a JSON object with exactly these keys:
+- business_name: string or null
+- contact_name: string or null
+- email: string or null
+- phone: string or null
+- industry: string or null
+- services: array of strings
+- budget_usd: number or null
+- has_website: boolean or null
+
+Return only the JSON object.
+
+Notes:
+{notes}
